@@ -8,6 +8,7 @@ import { Agents } from './pages/Agents';
 import { Intel } from './pages/Intel';
 import { Log } from './pages/Log';
 import { useAppStore } from './store/useAppStore';
+import { useSocket } from './hooks/useSocket';
 
 const PAGE_COMPONENTS = {
   dashboard: Dashboard,
@@ -22,9 +23,12 @@ export default function App() {
   const { page } = useAppStore();
   const PageComponent = PAGE_COMPONENTS[page];
 
+  // Connect WebSocket — updates store reactively
+  useSocket();
+
   return (
     <div className="flex h-screen overflow-hidden bg-void">
-      {/* Subtle scanline overlay across full app */}
+      {/* Subtle scanline overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-50 opacity-20"
         style={{

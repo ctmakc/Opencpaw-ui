@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -9,17 +10,23 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   log:       { title: 'ACTIVITY LOG',    subtitle: 'Real-time operations ledger' },
 };
 
-function useTime() {
-  // Static for SSR compat — in real app use useEffect + setInterval
-  const d = new Date();
-  return d.toLocaleTimeString('en-GB', { hour12: false });
+function useLiveClock() {
+  const [time, setTime] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return time;
 }
 
 export function TopBar() {
-  const { page } = useAppStore();
+  const { page, agents, wsConnected } = useAppStore();
   const meta  = PAGE_TITLES[page] ?? PAGE_TITLES.dashboard;
-  const time  = useTime();
-  const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const now   = useLiveClock();
+  const time  = now.toLocaleTimeString('en-GB', { hour12: false });
+  const today = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  const errorAgents = agents.filter((a) => a.status === 'error').length;
 
   return (
     <header className="h-14 flex-shrink-0 flex items-center justify-between px-5 bg-deck border-b border-steel/60">
@@ -33,18 +40,26 @@ export function TopBar() {
       </div>
 
       {/* Right controls */}
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-4">
+        {/* WS connection indicator */}
+        <div className={`flex items-center gap-1.5 font-mono text-[9px] ${wsConnected ? 'text-matrix' : 'text-plasma'}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${wsConnected ? 'bg-matrix animate-pulse' : 'bg-plasma'}`} />
+          {wsConnected ? 'LIVE' : 'OFFLINE'}
+        </div>
+
         {/* Timestamp */}
         <div className="text-right">
-          <div className="font-mono text-xs text-matrix glow-text-matrix">{time}</div>
+          <div className="font-mono text-xs text-matrix glow-text-matrix tabular-nums">{time}</div>
           <div className="font-mono text-[9px] text-ghost">{today}</div>
         </div>
 
         {/* Alert indicator */}
-        <div className="flex items-center gap-2 px-2.5 py-1 bg-plasma/10 border border-plasma/30 rounded font-mono text-xs text-plasma">
-          <span className="w-1.5 h-1.5 rounded-full bg-plasma animate-pulse" />
-          1 ALERT
-        </div>
+        {errorAgents > 0 && (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-plasma/10 border border-plasma/30 rounded font-mono text-xs text-plasma">
+            <span className="w-1.5 h-1.5 rounded-full bg-plasma animate-pulse" />
+            {errorAgents} ALERT{errorAgents > 1 ? 'S' : ''}
+          </div>
+        )}
 
         {/* User */}
         <div className="flex items-center gap-2">
