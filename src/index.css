@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    @apply bg-void text-mist font-ui;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-deck;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ghost rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-dim;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-hull border border-steel rounded-lg shadow-card;
+  }
+  .card-glow-matrix {
+    @apply card border-matrix/30 shadow-matrix;
+  }
+  .card-glow-cyber {
+    @apply card border-cyber/30 shadow-cyber;
+  }
+  .card-glow-amber {
+    @apply card border-amber/30 shadow-amber;
+  }
+
+  .terminal {
+    @apply font-mono text-matrix text-sm;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-mono font-medium;
+  }
+  .badge-working  { @apply badge bg-matrix/10 text-matrix border border-matrix/30; }
+  .badge-chatting { @apply badge bg-cyber/10 text-cyber border border-cyber/30; }
+  .badge-idle     { @apply badge bg-amber/10 text-amber border border-amber/30; }
+  .badge-offline  { @apply badge bg-ghost/20 text-dim border border-ghost/30; }
+  .badge-error    { @apply badge bg-plasma/10 text-plasma border border-plasma/30; }
+
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium
+           text-dim hover:text-mist hover:bg-plate transition-all duration-150 cursor-pointer
+           border border-transparent;
+  }
+  .nav-item.active {
+    @apply text-matrix bg-matrix/10 border-matrix/20 shadow-matrix;
+  }
+
+  .grid-bg {
+    background-image: linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .glow-text-matrix { text-shadow: 0 0 8px #00ff88, 0 0 20px #00ff8866; }
+  .glow-text-cyber  { text-shadow: 0 0 8px #00d4ff, 0 0 20px #00d4ff66; }
+  .glow-text-amber  { text-shadow: 0 0 8px #ff8c00, 0 0 20px #ff8c0066; }
+  .glow-text-plasma { text-shadow: 0 0 8px #ff3366, 0 0 20px #ff336666; }
+}
+
+.cursor-blink::after {
+  content: '█';
+  animation: blink 1.2s step-end infinite;
+  color: #00ff88;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
